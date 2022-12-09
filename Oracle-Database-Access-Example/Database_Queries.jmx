@@ -152,9 +152,9 @@ for(String element : headers){
 	}
 }
 
-FileUtils.writeStringToFile(outputFile, FirstLine, + System.getProperty(&quot;line.separator&quot;), true);
 
 if(outputFile.exists()){
+	FileUtils.writeStringToFile(outputFile, FirstLine, + System.getProperty(&quot;line.separator&quot;), true);
 	for(HashMap row : results){
 		Iterator it = row.entrySet().iterator();
 		String line = &quot;&quot;;
