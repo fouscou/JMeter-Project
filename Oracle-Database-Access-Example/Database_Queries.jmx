@@ -124,37 +124,41 @@
 
 ArrayList results = vars.getObject(&quot;query_results&quot;);
 String Transaction_1_Output_FilePath = vars.get(&quot;Transaction_1_Output_FilePath&quot;);
-
-ArrayList&lt;String&gt; headers = new ArrayList&lt;String&gt;();
-
 File outputFile = new File(Transaction_1_Output_FilePath);
-String FirstLine = &quot;&quot;;
 
-for(HashMap row : results){
-	Iterator it = row.entrySet().iterator();
-	while(it.hasNext()){
-		Map.Entry pair = (Map.Entry)it.next();
-		if(headers.isEmpty()){
-			headers.add(pair.getKey());
-		}else{
-			if(!headers.contains(pair.getKey())){
+
+def prepareHeaders(ArrayList headers){
+	ArrayList&lt;String&gt; headers = new ArrayList&lt;String&gt;();
+	for(HashMap row : results){
+		Iterator it = row.entrySet().iterator();
+		while(it.hasNext()){
+			Map.Entry pair = (Map.Entry)it.next();
+			if(headers.isEmpty()){
 				headers.add(pair.getKey());
+			}else{
+				if(!headers.contains(pair.getKey())){
+					headers.add(pair.getKey());
+				}
 			}
 		}
 	}
+	return headers;
 }
 
-for(String element : headers){
-	if(headers.indexOf(element) == (headers.size() -1)){
-		FirstLine = FirstLine + element;
-	}else{
-		FirstLine = FirstLine + element + &quot;;&quot;;
+def writeHeaders(File outputFile, ArrayList&lt;String&gt; headers){
+	String FirstLine = &quot;&quot;;
+	for(String element : headers){
+		if(headers.indexOf(element) == (headers.size() -1)){
+			FirstLine = FirstLine + element;
+		}else{
+			FirstLine = FirstLine + element + &quot;;&quot;;
+		}
 	}
+	FileUtils.writeStringToFile(outputFile, FirstLine, + System.getProperty(&quot;line.separator&quot;), true);
 }
 
 
-if(outputFile.exists()){
-	FileUtils.writeStringToFile(outputFile, FirstLine, + System.getProperty(&quot;line.separator&quot;), true);
+def writeContent(ArrayList results, File outputFile, ArrayList&lt;String&gt; headers){
 	for(HashMap row : results){
 		Iterator it = row.entrySet().iterator();
 		String line = &quot;&quot;;
@@ -170,7 +174,29 @@ if(outputFile.exists()){
 		}
 		FileUtils.writeStringToFile(outputFile, line + System.getProperty(&quot;line.separator&quot;), true);
 	}
-}</stringProp>
+}
+
+
+
+if(outputFile.exists()){
+	if(outputFile.length() == 0){
+		ArrayList&lt;String&gt; headers = prepareHeaders(results);
+		writeHeaders(outputFile, headers);
+		writeContent(results, outputFile, headers);
+	}else{
+		outputFile.delete();
+		outputFile.createNewFile();
+		ArrayList&lt;String&gt; headers = prepareHeaders(results);
+		writeHeaders(outputFile, headers);
+		writeContent(results, outputFile, headers);
+	}
+}else{
+	outputFile.createNewFile();
+	ArrayList&lt;String&gt; headers = prepareHeaders(results);
+	writeHeaders(outputFile, headers);
+	writeContent(results, outputFile, headers);
+}
+</stringProp>
             <stringProp name="scriptLanguage">groovy</stringProp>
           </JSR223PostProcessor>
           <hashTree/>
