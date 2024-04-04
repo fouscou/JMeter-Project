@@ -1,2 +1,2 @@
 # JMeter-Project
-Example Projects or Tutorial about JMeter
+Examples of JMeter Projects
